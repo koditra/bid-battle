@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Bid Battle</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <h1>Bid Battle</h1>
+        <p id="theme">Loading theme...</p>
+    </header>
+
+    <main>
+
+        <section class="players">
+
+            <div class="player" id="player1">
+                <h2>Player 1</h2>
+
+                <p>
+                    Money:
+                    $<span id="money1">20</span>
+                </p>
+
+                <p>
+                    Items:
+                    <span id="count1">0</span>/5
+                </p>
+
+                <div class="inventory">
+
+                    <div class="slot" id="p1-slot-1">
+                        Empty
+                    </div>
+
+                    <div class="slot" id="p1-slot-2">
+                        Empty
+                    </div>
+
+                    <div class="slot" id="p1-slot-3">
+                        Empty
+                    </div>
+
+                    <div class="slot" id="p1-slot-4">
+                        Empty
+                    </div>
+
+                    <div class="slot" id="p1-slot-5">
+                        Empty
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="player" id="player2">
+                <h2>Player 2</h2>
+
+                <p>
+                    Money:
+                    $<span id="money2">20</span>
+                </p>
+
+                <p>
+                    Items:
+                    <span id="count2">0</span>/5
+                </p>
+
+                <div class="inventory">
+
+                    <div class="slot" id="p2-slot-1">
+                        Empty
+                    </div>
+
+                    <div class="slot" id="p2-slot-2">
+                        Empty
+                    </div>
+
+                    <div class="slot" id="p2-slot-3">
+                        Empty
+                    </div>
+
+                    <div class="slot" id="p2-slot-4">
+                        Empty
+                    </div>
+
+                    <div class="slot" id="p2-slot-5">
+                        Empty
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+        <section class="auction">
+
+            <p>Current Item</p>
+
+            <h2 id="current-item">
+                Loading...
+            </h2>
+
+            <p>
+                Starting Bid:
+                $1
+            </p>
+
+            <p>
+                Current Bid:
+                $<span id="current-bid">1</span>
+            </p>
+
+            <p id="highest-bidder">
+                No bids yet
+            </p>
+
+            <p id="turn">
+                Player 1's turn
+            </p>
+
+            <div class="bid-controls">
+
+                <input
+                    type="number"
+                    id="bid-input"
+                    min="2"
+                    step="1"
+                    placeholder="Enter bid"
+                >
+
+                <button id="bid-button">
+                    Place Bid
+                </button>
+
+                <button id="pass-button">
+                    Pass
+                </button>
+
+            </div>
+
+            <p id="auction-status"></p>
+
+        </section>
+
+        <section class="game-info">
+
+            <p>
+                Items remaining:
+                <span id="items-remaining">10</span>
+            </p>
+
+            <p>
+                Items auctioned:
+                <span id="items-auctioned">0</span>/10
+            </p>
+
+        </section>
+
+        <button id="new-game-button">
+            New Game
+        </button>
+
+    </main>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
