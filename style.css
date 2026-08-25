@@ -1,265 +1,299 @@
 * {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    margin: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background: #111;
-    color: #fff;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    transition: background 0.4s ease, color 0.4s ease;
+}
+
+body.player1-turn {
+    background: #b91c1c;
+    color: white;
+}
+
+body.player2-turn {
+    background: #1d4ed8;
+    color: white;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+#game-mode-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: #111827;
+    color: white;
+    text-align: center;
+}
+
+#game-mode-screen h1 {
+    font-size: 52px;
+}
+
+#game-mode-screen h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+#ai-mode-button,
+#premade-mode-button {
+    width: 240px;
+    font-size: 18px;
+}
+
+#ai-mode-button {
+    background: #8b5cf6;
+    color: white;
+}
+
+#premade-mode-button {
+    background: white;
+    color: #111827;
+}
+
+#ai-loading {
+    min-height: 100vh;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background: #111827;
+    color: white;
+    text-align: center;
+}
+
+#ai-loading h1 {
+    font-size: 48px;
+}
+
+#ai-loading h2 {
+    font-size: 28px;
+}
+
+#ai-loading-text {
+    min-height: 24px;
+}
+
+#ai-progress-container {
+    width: min(500px, 80vw);
+    height: 24px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #374151;
+}
+
+#ai-progress {
+    width: 0%;
+    height: 100%;
+    border-radius: 20px;
+    background: #8b5cf6;
+    transition: width 0.2s ease;
+}
+
+#ai-percent {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+#game {
+    width: min(1100px, 94%);
+    margin: 0 auto;
+    padding: 30px 0 40px;
 }
 
 header {
     text-align: center;
-    padding: 30px 20px;
-    border-bottom: 1px solid #333;
+    margin-bottom: 25px;
 }
 
 header h1 {
-    margin: 0 0 10px;
-    font-size: 36px;
+    font-size: 46px;
+    margin-bottom: 10px;
 }
 
 #theme {
-    margin: 0;
-    color: #aaa;
-    font-size: 18px;
+    font-size: 28px;
 }
 
-main {
-    width: min(1100px, 92%);
-    margin: 30px auto;
-}
-
-.players {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.player {
-    padding: 20px;
-    background: #1b1b1b;
-    border: 1px solid #333;
-    border-radius: 14px;
-}
-
-.player h2 {
-    margin: 0 0 15px;
-}
-
-.player p {
-    color: #aaa;
-    margin: 8px 0;
-}
-
-.player p span {
-    color: #fff;
-    font-weight: bold;
-}
-
-.inventory {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin-top: 20px;
-}
-
-.slot {
-    min-height: 85px;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+#auction {
+    width: min(700px, 100%);
+    margin: 0 auto 25px;
+    padding: 25px;
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.25);
     text-align: center;
-    border: 1px dashed #555;
-    border-radius: 8px;
-    color: #777;
-    font-size: 13px;
-    background: #151515;
 }
 
-.slot.filled {
-    border-style: solid;
-    border-color: #666;
-    background: #252525;
-    color: #fff;
-}
-
-.auction {
-    width: min(650px, 100%);
-    margin: 30px auto;
-    padding: 30px;
-    text-align: center;
-    background: #1b1b1b;
-    border: 1px solid #333;
-    border-radius: 14px;
-}
-
-.auction > p:first-child {
-    margin: 0;
-    color: #777;
-    font-size: 14px;
-    text-transform: uppercase;
+#auction h2 {
+    margin-bottom: 15px;
 }
 
 #current-item {
-    margin: 15px 0 20px;
-    font-size: 30px;
-}
-
-.auction p {
-    color: #aaa;
-}
-
-#current-bid {
-    color: #fff;
-    font-size: 24px;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.15);
+    font-size: 28px;
     font-weight: bold;
 }
 
-#highest-bidder {
-    color: #ccc;
-    font-weight: bold;
+#auction-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
 }
 
-#turn {
-    margin: 20px 0;
-    color: #aaa;
-}
-
-.bid-controls {
+#controls {
     display: flex;
     justify-content: center;
-    align-items: center;
     gap: 10px;
     flex-wrap: wrap;
 }
 
 #bid-input {
-    width: 150px;
+    width: 160px;
     padding: 12px;
-    border: 1px solid #555;
-    border-radius: 8px;
-    background: #222;
-    color: #fff;
-    font-size: 16px;
-}
-
-#bid-input:focus {
-    outline: none;
-    border-color: #fff;
-}
-
-#bid-input::placeholder {
-    color: #777;
-}
-
-button {
-    padding: 12px 20px;
     border: none;
-    border-radius: 8px;
-    background: #fff;
-    color: #111;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
+    border-radius: 10px;
+    outline: none;
+    font-size: 18px;
 }
 
-button:hover {
-    opacity: 0.85;
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-button:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
+#bid-button {
+    background: #22c55e;
+    color: white;
 }
 
 #pass-button {
-    background: #333;
-    color: #fff;
+    background: #facc15;
+    color: #111827;
 }
 
 #auction-status {
     min-height: 24px;
-    margin-top: 20px;
-    color: #aaa;
+    margin-top: 18px;
+    font-weight: bold;
 }
 
-.game-info {
+#players {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+#player1,
+#player2 {
+    padding: 22px;
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#player1 {
+    border: 3px solid rgba(255, 255, 255, 0.35);
+}
+
+#player2 {
+    border: 3px solid rgba(255, 255, 255, 0.35);
+}
+
+#player1 h2,
+#player2 h2 {
+    margin-bottom: 12px;
+}
+
+.inventory {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.item-slot {
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
     text-align: center;
-    color: #777;
+    font-weight: bold;
 }
 
-.game-info p {
-    margin: 8px;
+.item-slot.filled {
+    background: rgba(255, 255, 255, 0.3);
 }
 
-.game-info span {
-    color: #fff;
+#game-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 25px 0;
     font-weight: bold;
 }
 
 #new-game-button {
     display: block;
-    margin: 25px auto;
-}
-
-.player.active {
-    border-color: #fff;
-}
-
-.player.inactive {
-    opacity: 0.75;
+    margin: 0 auto;
+    background: white;
+    color: #111827;
 }
 
 @media (max-width: 700px) {
-    main {
-        width: 94%;
-    }
-
-    .players {
+    #players {
         grid-template-columns: 1fr;
     }
 
-    .inventory {
-        grid-template-columns: repeat(5, 1fr);
-    }
-
-    #current-item {
-        font-size: 24px;
-    }
-
-    .bid-controls {
-        flex-direction: column;
-    }
-
-    #bid-input,
-    #bid-button,
-    #pass-button {
-        width: 100%;
-    }
-}
-
-@media (max-width: 450px) {
     header h1 {
-        font-size: 28px;
+        font-size: 36px;
     }
 
     #theme {
-        font-size: 16px;
+        font-size: 22px;
     }
 
-    .slot {
-        min-height: 70px;
-        font-size: 11px;
+    #current-item {
+        font-size: 22px;
     }
 
-    .auction {
-        padding: 20px;
+    #game-stats {
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
     }
 }
