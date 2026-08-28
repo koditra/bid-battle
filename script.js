@@ -546,7 +546,8 @@ function showModeScreen() {
         loadingScreen.style.display = "none";
     }
 
-    const game = document.getElementById("game");
+    const game =
+        document.getElementById("game");
 
     if (game) {
         game.style.display = "none";
@@ -562,7 +563,8 @@ function showLoadingScreen() {
         loadingScreen.style.display = "flex";
     }
 
-    const game = document.getElementById("game");
+    const game =
+        document.getElementById("game");
 
     if (game) {
         game.style.display = "none";
@@ -578,7 +580,8 @@ function showGameScreen() {
         loadingScreen.style.display = "none";
     }
 
-    const game = document.getElementById("game");
+    const game =
+        document.getElementById("game");
 
     if (game) {
         game.style.display = "block";
@@ -649,7 +652,10 @@ async function loadAI() {
                         const displayPercent =
                             Math.max(
                                 10,
-                                Math.min(99, percent)
+                                Math.min(
+                                    99,
+                                    percent
+                                )
                             );
 
                         progressBar.style.width =
@@ -715,7 +721,8 @@ async function generateGame() {
     const idea =
         gameIdeas[
             Math.floor(
-                Math.random() * gameIdeas.length
+                Math.random() *
+                gameIdeas.length
             )
         ];
 
@@ -790,68 +797,96 @@ Format:
 }
 
 function parseAIResponse(text) {
-    let cleaned = String(text).trim();
+    let cleaned =
+        String(text).trim();
 
-    cleaned = cleaned.replace(
-        /```json/gi,
-        ""
-    );
+    cleaned =
+        cleaned.replace(
+            /```json/gi,
+            ""
+        );
 
-    cleaned = cleaned.replace(
-        /```/g,
-        ""
-    );
+    cleaned =
+        cleaned.replace(
+            /```/g,
+            ""
+        );
 
-    const start = cleaned.indexOf("{");
-    const end = cleaned.lastIndexOf("}");
+    const start =
+        cleaned.indexOf("{");
 
-    if (start === -1 || end === -1) {
+    const end =
+        cleaned.lastIndexOf("}");
+
+    if (
+        start === -1 ||
+        end === -1
+    ) {
         throw new Error("No JSON");
     }
 
-    cleaned = cleaned.substring(
-        start,
-        end + 1
-    );
+    cleaned =
+        cleaned.substring(
+            start,
+            end + 1
+        );
 
     let data;
 
     try {
-        data = JSON.parse(cleaned);
+        data =
+            JSON.parse(cleaned);
     } catch {
         throw new Error("Invalid JSON");
     }
 
     if (
-        typeof data.theme !== "string"
+        typeof data.theme !==
+        "string"
     ) {
         throw new Error("Invalid theme");
     }
 
-    if (!Array.isArray(data.items)) {
+    if (
+        !Array.isArray(data.items)
+    ) {
         throw new Error("Invalid items");
     }
 
     const cleanItems =
         data.items
-            .map(item => String(item).trim())
-            .filter(item => item.length > 0);
+            .map(item =>
+                String(item).trim()
+            )
+            .filter(item =>
+                item.length > 0
+            );
 
     const uniqueItems =
         [...new Set(cleanItems)];
 
-    if (uniqueItems.length < 10) {
-        throw new Error("Not enough items");
+    if (
+        uniqueItems.length < 10
+    ) {
+        throw new Error(
+            "Not enough items"
+        );
     }
 
     return {
-        theme: data.theme.trim(),
-        items: uniqueItems.slice(0, 10)
+        theme:
+            data.theme.trim(),
+        items:
+            uniqueItems.slice(0, 10)
     };
 }
 
 async function generateWithRetry() {
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    for (
+        let attempt = 1;
+        attempt <= 3;
+        attempt++
+    ) {
         try {
             const game =
                 await generateGame();
@@ -885,8 +920,10 @@ async function generateWithRetry() {
         ];
 
     return {
-        theme: fallback.theme,
-        items: [...fallback.items]
+        theme:
+            fallback.theme,
+        items:
+            [...fallback.items]
     };
 }
 
@@ -918,14 +955,18 @@ function placeBid(bid) {
         return;
     }
 
-    if (bid > player.money) {
+    if (
+        bid > player.money
+    ) {
         showStatus(
             "You don't have enough money."
         );
         return;
     }
 
-    if (player.items.length >= 5) {
+    if (
+        player.items.length >= 5
+    ) {
         showStatus(
             "You already have 5 items."
         );
@@ -933,10 +974,13 @@ function placeBid(bid) {
     }
 
     currentBid = bid;
-    highestBidder = currentPlayer;
+    highestBidder =
+        currentPlayer;
 
     currentPlayer =
-        currentPlayer === 0 ? 1 : 0;
+        currentPlayer === 0
+            ? 1
+            : 0;
 
     bidInput.value = "";
 
@@ -945,10 +989,119 @@ function placeBid(bid) {
     );
 
     updateUI();
+
+    checkForZeroMoney();
+}
+
+function checkForZeroMoney() {
+    const player =
+        players[currentPlayer];
+
+    if (
+        player.money > 0 ||
+        player.items.length >= 5
+    ) {
+        return;
+    }
+
+    if (
+        highestBidder !== null
+    ) {
+        showStatus(
+            `Player ${currentPlayer + 1} has $0 and automatically passes.`
+        );
+
+        setTimeout(() => {
+            pass();
+        }, 300);
+
+        return;
+    }
+
+    currentPlayer =
+        currentPlayer === 0
+            ? 1
+            : 0;
+
+    showStatus(
+        `Player ${currentPlayer + 1}'s turn.`
+    );
+
+    updateUI();
+
+    if (
+        players[currentPlayer].money <= 0
+    ) {
+        finishNoMoneyTurns();
+    }
+}
+
+function finishNoMoneyTurns() {
+    const player =
+        players[currentPlayer];
+
+    if (
+        player.money > 0 ||
+        player.items.length >= 5
+    ) {
+        updateUI();
+        return;
+    }
+
+    const otherIndex =
+        currentPlayer === 0
+            ? 1
+            : 0;
+
+    const otherPlayer =
+        players[otherIndex];
+
+    if (
+        otherPlayer.items.length >= 5
+    ) {
+        finishPlayer(otherIndex);
+        return;
+    }
+
+    if (
+        highestBidder !== null
+    ) {
+        currentPlayer =
+            otherIndex;
+
+        updateUI();
+
+        setTimeout(() => {
+            pass();
+        }, 300);
+
+        return;
+    }
+
+    currentPlayer =
+        otherIndex;
+
+    updateUI();
+
+    if (
+        otherPlayer.money <= 0
+    ) {
+        if (
+            otherPlayer.items.length >= 5
+        ) {
+            finishPlayer(
+                otherIndex
+            );
+        } else {
+            distributeRemainingItems();
+        }
+    }
 }
 
 function pass() {
-    if (highestBidder === null) {
+    if (
+        highestBidder === null
+    ) {
         showStatus(
             "You can't pass yet. Player 1 must bid $1 first."
         );
@@ -964,20 +1117,32 @@ function pass() {
     const item =
         getCurrentItem();
 
-    if (winner.items.length >= 5) {
-        finishPlayer(winnerIndex);
-        return;
-    }
-
-    if (winner.money < currentBid) {
-        showStatus(
-            "The winner can't afford this item."
+    if (
+        winner.items.length >= 5
+    ) {
+        finishPlayer(
+            winnerIndex
         );
         return;
     }
 
-    winner.money -= currentBid;
-    winner.items.push(item);
+    if (
+        winner.money < currentBid
+    ) {
+        showStatus(
+            "The winner can't afford this item."
+        );
+
+        return;
+    }
+
+    winner.money -=
+        currentBid;
+
+    winner.items.push(
+        item
+    );
+
     currentItemIndex++;
 
     if (
@@ -989,8 +1154,12 @@ function pass() {
         return;
     }
 
-    if (winner.items.length >= 5) {
-        finishPlayer(winnerIndex);
+    if (
+        winner.items.length >= 5
+    ) {
+        finishPlayer(
+            winnerIndex
+        );
         return;
     }
 
@@ -998,7 +1167,9 @@ function pass() {
     highestBidder = null;
 
     currentPlayer =
-        winnerIndex === 0 ? 1 : 0;
+        winnerIndex === 0
+            ? 1
+            : 0;
 
     bidInput.value = "";
 
@@ -1007,11 +1178,15 @@ function pass() {
     );
 
     updateUI();
+
+    checkForZeroMoney();
 }
 
 function finishPlayer(playerIndex) {
     const otherIndex =
-        playerIndex === 0 ? 1 : 0;
+        playerIndex === 0
+            ? 1
+            : 0;
 
     const otherPlayer =
         players[otherIndex];
@@ -1023,11 +1198,16 @@ function finishPlayer(playerIndex) {
         const item =
             getCurrentItem();
 
-        if (otherPlayer.money >= 1) {
+        if (
+            otherPlayer.money >= 1
+        ) {
             otherPlayer.money -= 1;
         }
 
-        otherPlayer.items.push(item);
+        otherPlayer.items.push(
+            item
+        );
+
         currentItemIndex++;
     }
 
@@ -1051,6 +1231,72 @@ function finishPlayer(playerIndex) {
     );
 
     updateUI();
+
+    checkForZeroMoney();
+}
+
+function distributeRemainingItems() {
+    const player1HasRoom =
+        player1.items.length < 5;
+
+    const player2HasRoom =
+        player2.items.length < 5;
+
+    if (
+        !player1HasRoom &&
+        !player2HasRoom
+    ) {
+        endGame();
+        return;
+    }
+
+    while (
+        currentItemIndex < items.length
+    ) {
+        let target;
+
+        if (
+            player1.items.length < 5 &&
+            player2.items.length < 5
+        ) {
+            target =
+                player1.items.length <=
+                player2.items.length
+                    ? player1
+                    : player2;
+        } else if (
+            player1.items.length < 5
+        ) {
+            target = player1;
+        } else {
+            target = player2;
+        }
+
+        const item =
+            getCurrentItem();
+
+        if (
+            target.money >= 1
+        ) {
+            target.money -= 1;
+        }
+
+        target.items.push(
+            item
+        );
+
+        currentItemIndex++;
+
+        if (
+            player1.items.length >= 5 &&
+            player2.items.length >= 5
+        ) {
+            break;
+        }
+    }
+
+    updateUI();
+    endGame();
 }
 
 function updateUI() {
@@ -1090,7 +1336,9 @@ function updateUI() {
     turnElement.textContent =
         `Player ${currentPlayer + 1}'s turn`;
 
-    if (highestBidder === null) {
+    if (
+        highestBidder === null
+    ) {
         highestBidderElement.textContent =
             "No bids yet";
     } else {
@@ -1114,7 +1362,11 @@ function updateUI() {
 }
 
 function updateInventory() {
-    for (let i = 0; i < 5; i++) {
+    for (
+        let i = 0;
+        i < 5;
+        i++
+    ) {
         const p1 =
             document.getElementById(
                 `p1-slot-${i + 1}`
@@ -1132,7 +1384,9 @@ function updateInventory() {
 
             p1.classList.toggle(
                 "filled",
-                Boolean(player1.items[i])
+                Boolean(
+                    player1.items[i]
+                )
             );
         }
 
@@ -1143,7 +1397,9 @@ function updateInventory() {
 
             p2.classList.toggle(
                 "filled",
-                Boolean(player2.items[i])
+                Boolean(
+                    player2.items[i]
+                )
             );
         }
     }
@@ -1153,10 +1409,15 @@ function updateButtons() {
     const player =
         players[currentPlayer];
 
-    if (player.items.length >= 5) {
+    if (
+        player.items.length >= 5 ||
+        player.money <= 0
+    ) {
         bidInput.disabled = true;
         bidButton.disabled = true;
-        passButton.disabled = true;
+        passButton.disabled =
+            highestBidder === null;
+
         return;
     }
 
@@ -1165,7 +1426,9 @@ function updateButtons() {
     bidButton.disabled =
         player.money < 1;
 
-    if (highestBidder === null) {
+    if (
+        highestBidder === null
+    ) {
         bidInput.min = 1;
         passButton.disabled = true;
     } else {
@@ -1234,7 +1497,9 @@ async function startGame() {
     updateUI();
 
     try {
-        if (gameMode === "premade") {
+        if (
+            gameMode === "premade"
+        ) {
             const game =
                 premadeGames[
                     Math.floor(
@@ -1270,6 +1535,8 @@ async function startGame() {
         );
 
         updateUI();
+
+        checkForZeroMoney();
 
     } catch (error) {
         console.warn(
@@ -1342,7 +1609,9 @@ passButton.addEventListener(
 bidInput.addEventListener(
     "keydown",
     event => {
-        if (event.key === "Enter") {
+        if (
+            event.key === "Enter"
+        ) {
             const bid =
                 Number(
                     bidInput.value
