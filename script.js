@@ -21,6 +21,7 @@ let items = [];
 let engine = null;
 let aiReady = false;
 let gameMode = null;
+let gameStarted = false;
 
 const MODEL = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
 
