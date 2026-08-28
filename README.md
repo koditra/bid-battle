@@ -19,7 +19,7 @@ Bid Battle is a 2-player auction game where you compete to build the best thing 
 
 AI Mode uses WebLLM to run Llama 3.2 1B directly in the browser.
 
-the AI creates a theme and 10 related items. it also has multiple fallback games so the game can still work if the AI has trouble generating something.
+the AI creates a theme and 10 related items.
 
 the AI model can take a while to download the first time, so there is a loading screen with a progress bar.
 
