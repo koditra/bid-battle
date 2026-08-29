@@ -5,14 +5,15 @@
 }
 
 body {
+    min-height: 100vh;
     font-family: Arial, sans-serif;
-    background: #ffd6dc;
-    color: #333;
-    transition: background .4s;
+    color: #fff;
+    background: #ec3750;
+    transition: .5s;
 }
 
 body.player2-turn {
-    background: #cfe3ff;
+    background: #3388ff;
 }
 
 #game-mode-screen,
@@ -20,78 +21,150 @@ body.player2-turn {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: 20px;
+    padding: 25px;
 }
 
 #game-mode-screen {
     background: #fff8f5;
+    color: #222;
+    position: relative;
+    overflow: hidden;
+}
+
+#game-mode-screen::before,
+#game-mode-screen::after {
+    content: "";
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    border-radius: 20px;
+}
+
+#game-mode-screen::before {
+    background: #ffd166;
+    top: 12%;
+    left: 10%;
+    transform: rotate(15deg);
+}
+
+#game-mode-screen::after {
+    background: #9be7c4;
+    bottom: 12%;
+    right: 10%;
+    transform: rotate(-12deg);
+}
+
+#game-mode-screen h1,
+#game-mode-screen h2,
+#game-mode-screen p,
+#game-mode-screen button {
+    position: relative;
+    z-index: 1;
 }
 
 h1 {
-    font-size: 60px;
     font-weight: 900;
-    margin-bottom: 15px;
+    letter-spacing: -4px;
+}
+
+#game-mode-screen h1,
+#ai-loading h1 {
+    font-size: clamp(45px, 8vw, 80px);
 }
 
 #game-mode-screen h1 {
-    color: #f06a7a;
+    color: #ec3750;
+    transform: rotate(-2deg);
+    margin-bottom: 5px;
 }
 
-p {
+#game-mode-screen h2 {
+    font-size: 25px;
+    margin-bottom: 8px;
+}
+
+#game-mode-screen p,
+#ai-loading p {
+    max-width: 550px;
+    margin: 15px 0 25px;
     line-height: 1.5;
+    color: #666;
 }
 
 button {
-    padding: 12px 20px;
+    padding: 13px 22px;
     border: 0;
-    border-radius: 8px;
-    font-weight: bold;
+    border-radius: 7px;
+    font-weight: 800;
     cursor: pointer;
 }
 
 #game-mode-screen button {
-    width: 350px;
-    max-width: 90%;
-    margin: 5px;
-    color: white;
-    font-size: 17px;
+    width: min(400px, 90vw);
+    margin: 8px;
+    padding: 18px 25px;
+    font-size: 18px;
+    border: 3px solid #222;
+    color: #fff;
+    transition: transform .15s;
+}
+
+#game-mode-screen button:hover {
+    transform: translateY(-4px) rotate(-1deg);
+}
+
+#game-mode-screen button:active {
+    transform: translateY(2px);
 }
 
 #ai-mode-button {
-    background: #b69cff;
+    background: #8b5cf6;
+    box-shadow: 5px 5px #222;
 }
 
 #premade-mode-button {
-    background: #f06a7a;
+    background: #ec3750;
+    box-shadow: 5px 5px #222;
 }
 
 #ai-loading {
-    background: #f5efff;
+    background: #222;
+}
+
+#ai-loading h1,
+#ai-loading h2 {
+    color: #fff;
+}
+
+#ai-loading p {
+    color: #aaa;
 }
 
 #ai-progress-container {
-    width: 500px;
-    max-width: 90%;
-    height: 15px;
-    margin: 20px 0 10px;
-    background: #ddd;
-    border-radius: 10px;
+    width: min(600px, 85vw);
+    height: 18px;
+    background: #444;
+    border-radius: 20px;
     overflow: hidden;
 }
 
 #ai-progress {
-    width: 0;
+    width: 0%;
     height: 100%;
-    background: #b69cff;
-    transition: width .3s;
+    background: #8b5cf6;
+    transition: .3s;
+}
+
+#ai-percent {
+    margin-top: 10px;
+    font-weight: 800;
 }
 
 #game {
-    width: 90%;
-    max-width: 1100px;
+    width: min(1100px, 92vw);
     margin: auto;
     padding: 30px 0;
 }
@@ -102,30 +175,45 @@ header {
 }
 
 header h1 {
-    font-size: 55px;
+    font-size: clamp(45px, 7vw, 65px);
 }
 
 #theme {
     display: inline-block;
-    margin-top: 5px;
-    padding: 6px 12px;
-    background: #fff;
-    border-radius: 20px;
+    margin-top: 8px;
+    padding: 7px 13px;
+    background: #222;
+    border-radius: 6px;
+    font-weight: 800;
+}
+
+#auction,
+#player1,
+#player2 {
+    background: #222;
+    border: 3px solid #111;
+    border-radius: 9px;
+    box-shadow: 5px 5px #111;
 }
 
 #auction {
     padding: 25px;
-    background: #fff;
-    border-radius: 12px;
     text-align: center;
 }
 
+#auction h2 {
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: #aaa;
+    text-transform: uppercase;
+}
+
 #current-item {
-    min-height: 70px;
+    min-height: 75px;
     display: grid;
     place-items: center;
-    font-size: 40px;
-    font-weight: bold;
+    font-size: clamp(30px, 5vw, 48px);
+    font-weight: 900;
 }
 
 #auction-info,
@@ -134,77 +222,95 @@ header h1 {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 15px;
+    gap: 8px;
+}
+
+#auction-info {
+    margin: 18px 0;
 }
 
 #auction-info p,
 #game-stats p {
     padding: 8px 12px;
-    background: #f1f1f1;
+    background: #333;
     border-radius: 6px;
 }
 
 #current-bid {
-    font-weight: bold;
-    font-size: 22px;
+    font-size: 24px;
+    font-weight: 900;
+}
+
+#controls {
+    margin-top: 18px;
 }
 
 #bid-input {
-    padding: 12px;
     width: 170px;
-    border: 2px solid #ddd;
-    border-radius: 7px;
-    font-size: 17px;
+    padding: 12px;
+    border: 2px solid #555;
+    border-radius: 6px;
+    background: #111;
+    color: #fff;
+    font-size: 18px;
 }
 
 #bid-button {
-    background: #91d8a0;
+    background: #34a853;
 }
 
 #pass-button {
-    background: #ffd27d;
+    background: #f59e0b;
+}
+
+#controls button:disabled {
+    opacity: .4;
+    cursor: not-allowed;
 }
 
 #auction-status {
-    margin-top: 15px;
-    min-height: 22px;
+    min-height: 25px;
+    margin-top: 18px;
+    font-weight: 700;
 }
 
 #players {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin-top: 20px;
+    gap: 16px;
+    margin-top: 22px;
 }
 
 #player1,
 #player2 {
     padding: 20px;
-    background: #fff;
-    border-radius: 12px;
 }
 
 #player1 {
-    border-top: 6px solid #f06a7a;
+    border-top: 6px solid #ff6b81;
 }
 
 #player2 {
-    border-top: 6px solid #76aaf5;
+    border-top: 6px solid #63a4ff;
+}
+
+#player1 p,
+#player2 p {
+    margin: 6px 0;
+    color: #ddd;
 }
 
 #money1,
 #money2 {
-    font-size: 21px;
-    font-weight: bold;
-    margin-top: 8px;
+    font-size: 22px;
+    font-weight: 900;
 }
 
 .inventory {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 6px;
-    margin-top: 15px;
+    margin-top: 16px;
 }
 
 .item-slot {
@@ -212,24 +318,30 @@ header h1 {
     display: grid;
     place-items: center;
     padding: 5px;
-    background: #f3f3f3;
-    border: 2px dashed #ccc;
-    border-radius: 6px;
-    color: #999;
+    background: #181818;
+    border: 2px dashed #555;
+    border-radius: 5px;
+    color: #777;
     font-size: 12px;
     text-align: center;
 }
 
 .item-slot.filled {
-    background: #e7e7e7;
-    color: #333;
+    color: #fff;
     border-style: solid;
+    background: #333;
+}
+
+#game-stats {
+    margin: 22px 0;
 }
 
 #new-game-button {
     display: block;
-    margin: 20px auto;
+    margin: auto;
     background: #fff;
+    color: #222;
+    border: 3px solid #111;
 }
 
 @media (max-width: 700px) {
@@ -237,8 +349,19 @@ header h1 {
         grid-template-columns: 1fr;
     }
 
-    h1,
-    header h1 {
-        font-size: 45px;
+    #bid-input {
+        width: 100%;
+    }
+
+    #controls button {
+        flex: 1;
+    }
+
+    #game-mode-screen::before {
+        left: -30px;
+    }
+
+    #game-mode-screen::after {
+        right: -30px;
     }
 }
