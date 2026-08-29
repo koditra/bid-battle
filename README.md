@@ -21,6 +21,8 @@ AI Mode uses WebLLM to run Llama 3.2 1B directly in the browser.
 
 the AI creates a theme and 10 related items.
 
+(IT DOES NOT PLAY AGAINST YOU)
+
 the AI model can take a while to download the first time, so there is a loading screen with a progress bar.
 
 ## Premade Mode
