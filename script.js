@@ -17,7 +17,6 @@ let currentItemIndex = 0;
 let currentBid = 1;
 let highestBidder = null;
 let items = [];
-
 let engine = null;
 let aiReady = false;
 let gameMode = null;
@@ -744,26 +743,20 @@ Format:
 }
 
 function parseAIResponse(text) {
-    let cleaned =
-        String(text).trim();
+    let cleaned = String(text).trim();
 
-    cleaned =
-        cleaned.replace(
-            /```json/gi,
-            ""
-        );
+    cleaned = cleaned.replace(
+        /```json/gi,
+        ""
+    );
 
-    cleaned =
-        cleaned.replace(
-            /```/g,
-            ""
-        );
+    cleaned = cleaned.replace(
+        /```/g,
+        ""
+    );
 
-    const start =
-        cleaned.indexOf("{");
-
-    const end =
-        cleaned.lastIndexOf("}");
+    const start = cleaned.indexOf("{");
+    const end = cleaned.lastIndexOf("}");
 
     if (
         start === -1 ||
@@ -781,8 +774,7 @@ function parseAIResponse(text) {
     let data;
 
     try {
-        data =
-            JSON.parse(cleaned);
+        data = JSON.parse(cleaned);
     } catch {
         throw new Error("Invalid JSON");
     }
@@ -801,12 +793,8 @@ function parseAIResponse(text) {
 
     const cleanItems =
         data.items
-            .map(item =>
-                String(item).trim()
-            )
-            .filter(item =>
-                item.length > 0
-            );
+            .map(item => String(item).trim())
+            .filter(item => item.length > 0);
 
     const uniqueItems =
         [...new Set(cleanItems)];
@@ -818,10 +806,8 @@ function parseAIResponse(text) {
     }
 
     return {
-        theme:
-            data.theme.trim(),
-        items:
-            uniqueItems.slice(0, 10)
+        theme: data.theme.trim(),
+        items: uniqueItems.slice(0, 10)
     };
 }
 
@@ -864,15 +850,33 @@ async function generateWithRetry() {
         ];
 
     return {
-        theme:
-            fallback.theme,
-        items:
-            [...fallback.items]
+        theme: fallback.theme,
+        items: [...fallback.items]
     };
 }
 
 function getCurrentItem() {
     return items[currentItemIndex];
+}
+
+function money(value) {
+    return Math.round(value * 100) / 100;
+}
+
+function nextAvailablePlayer(startIndex) {
+    for (let i = 0; i < 2; i++) {
+        const index = (startIndex + i) % 2;
+        const player = players[index];
+
+        if (
+            player.items.length < 5 &&
+            player.money > 0
+        ) {
+            return index;
+        }
+    }
+
+    return null;
 }
 
 function placeBid(bid) {
@@ -883,8 +887,10 @@ function placeBid(bid) {
     const player =
         players[currentPlayer];
 
+    bid = Number(bid);
+
     if (
-        !Number.isInteger(bid) ||
+        !Number.isFinite(bid) ||
         bid < 1
     ) {
         showStatus(
@@ -893,12 +899,14 @@ function placeBid(bid) {
         return;
     }
 
+    bid = money(bid);
+
     if (
         highestBidder !== null &&
         bid <= currentBid
     ) {
         showStatus(
-            `Your bid must be higher than $${currentBid}.`
+            `Your bid must be higher than $${currentBid.toFixed(2)}.`
         );
         return;
     }
@@ -915,9 +923,7 @@ function placeBid(bid) {
     if (
         player.items.length >= 5
     ) {
-        showStatus(
-            "You already have 5 items."
-        );
+        moveToNextPlayer();
         return;
     }
 
@@ -932,14 +938,35 @@ function placeBid(bid) {
     bidInput.value = "";
 
     showStatus(
-        `Player ${highestBidder + 1} bid $${currentBid}.`
+        `Player ${highestBidder + 1} bid $${currentBid.toFixed(2)}.`
     );
 
     updateUI();
-    checkForZeroMoney();
+    checkPlayerTurn();
 }
 
-function checkForZeroMoney() {
+function moveToNextPlayer() {
+    const next =
+        nextAvailablePlayer(
+            currentPlayer === 0 ? 1 : 0
+        );
+
+    if (next === null) {
+        if (highestBidder !== null) {
+            awardItem();
+        } else {
+            distributeRemainingItems();
+        }
+
+        return;
+    }
+
+    currentPlayer = next;
+    updateUI();
+    checkPlayerTurn();
+}
+
+function checkPlayerTurn() {
     if (!gameStarted) {
         return;
     }
@@ -948,49 +975,54 @@ function checkForZeroMoney() {
         players[currentPlayer];
 
     if (
-        player.money > 0 ||
+        currentItemIndex >= items.length
+    ) {
+        endGame();
+        return;
+    }
+
+    if (
         player.items.length >= 5
     ) {
+        const next =
+            nextAvailablePlayer(
+                currentPlayer === 0 ? 1 : 0
+            );
+
+        if (next !== null) {
+            currentPlayer = next;
+            updateUI();
+            return;
+        }
+
+        if (highestBidder !== null) {
+            awardItem();
+        } else {
+            distributeRemainingItems();
+        }
+
         return;
     }
-
-    if (highestBidder !== null) {
-        showStatus(
-            `Player ${currentPlayer + 1} has $0 and automatically passes.`
-        );
-
-        setTimeout(() => {
-            pass();
-        }, 300);
-
-        return;
-    }
-
-    const otherIndex =
-        currentPlayer === 0
-            ? 1
-            : 0;
-
-    const otherPlayer =
-        players[otherIndex];
 
     if (
-        otherPlayer.items.length >= 5
+        player.money <= 0
     ) {
-        finishPlayer(otherIndex);
+        if (highestBidder !== null) {
+            showStatus(
+                `Player ${currentPlayer + 1} has no money and passes.`
+            );
+
+            setTimeout(() => {
+                pass();
+            }, 300);
+        } else {
+            moveToNextPlayer();
+        }
+
         return;
     }
-
-    currentPlayer =
-        otherIndex;
 
     updateUI();
-
-    if (
-        otherPlayer.money <= 0
-    ) {
-        distributeRemainingItems();
-    }
 }
 
 function pass() {
@@ -998,30 +1030,43 @@ function pass() {
         return;
     }
 
-    const otherPlayerIndex =
-        currentPlayer === 0
-            ? 1
-            : 0;
+    if (
+        currentItemIndex >= items.length
+    ) {
+        endGame();
+        return;
+    }
 
-    const otherPlayer =
-        players[otherPlayerIndex];
+    const player =
+        players[currentPlayer];
 
-    const item =
-        getCurrentItem();
-
-    if (!item) {
+    if (
+        player.items.length >= 5 ||
+        player.money <= 0
+    ) {
+        moveToNextPlayer();
         return;
     }
 
     if (highestBidder === null) {
+        const otherIndex =
+            currentPlayer === 0 ? 1 : 0;
+
+        const otherPlayer =
+            players[otherIndex];
+
         if (
-            otherPlayer.money === 0
+            otherPlayer.money <= 0 ||
+            otherPlayer.items.length >= 5
         ) {
+            const item =
+                getCurrentItem();
+
             if (
                 otherPlayer.items.length >= 5
             ) {
                 showStatus(
-                    `Player ${otherPlayerIndex + 1} already has 5 items.`
+                    `Player ${otherIndex + 1} already has 5 items.`
                 );
                 return;
             }
@@ -1030,7 +1075,7 @@ function pass() {
             currentItemIndex++;
 
             showStatus(
-                `Player ${currentPlayer + 1} passed. ${item} went to Player ${otherPlayerIndex + 1} for $0.`
+                `Player ${currentPlayer + 1} passed. ${item} went to Player ${otherIndex + 1} for $0.`
             );
 
             if (
@@ -1042,43 +1087,60 @@ function pass() {
 
             currentBid = 1;
             highestBidder = null;
-            currentPlayer = otherPlayerIndex;
+            currentPlayer = otherIndex;
             bidInput.value = "";
 
             updateUI();
-            checkForZeroMoney();
+            checkPlayerTurn();
 
-            return;
-        }
-
-        if (
-            otherPlayer.items.length >= 5
-        ) {
-            showStatus(
-                `Player ${otherPlayerIndex + 1} already has 5 items.`
-            );
             return;
         }
 
         showStatus(
-            "You can't pass yet. Someone must bid $1 first."
+            "You can't pass until someone bids $1."
         );
 
+        return;
+    }
+
+    awardItem();
+}
+
+function awardItem() {
+    if (!gameStarted) {
         return;
     }
 
     const winnerIndex =
         highestBidder;
 
+    if (
+        winnerIndex === null
+    ) {
+        return;
+    }
+
     const winner =
         players[winnerIndex];
+
+    const item =
+        getCurrentItem();
+
+    if (!item) {
+        endGame();
+        return;
+    }
 
     if (
         winner.items.length >= 5
     ) {
-        showStatus(
-            "That player already has 5 items."
-        );
+        const otherIndex =
+            winnerIndex === 0 ? 1 : 0;
+
+        currentPlayer = otherIndex;
+        updateUI();
+        checkPlayerTurn();
+
         return;
     }
 
@@ -1091,12 +1153,16 @@ function pass() {
         return;
     }
 
-    winner.money -= currentBid;
+    winner.money =
+        money(
+            winner.money - currentBid
+        );
+
     winner.items.push(item);
     currentItemIndex++;
 
     showStatus(
-        `Player ${winnerIndex + 1} won ${item} for $${currentBid}.`
+        `Player ${winnerIndex + 1} won ${item} for $${currentBid.toFixed(2)}.`
     );
 
     if (
@@ -1108,93 +1174,41 @@ function pass() {
 
     currentBid = 1;
     highestBidder = null;
-
-    const nextPlayerIndex =
-        winnerIndex === 0
-            ? 1
-            : 0;
-
-    if (
-        players[nextPlayerIndex].money > 0 &&
-        players[nextPlayerIndex].items.length < 5
-    ) {
-        currentPlayer =
-            nextPlayerIndex;
-    } else {
-        currentPlayer =
-            winnerIndex;
-    }
-
-    bidInput.value = "";
-
-    updateUI();
-    checkForZeroMoney();
-}
-
-function finishPlayer(playerIndex) {
-    if (!gameStarted) {
-        return;
-    }
 
     const otherIndex =
-        playerIndex === 0
-            ? 1
-            : 0;
+        winnerIndex === 0 ? 1 : 0;
 
-    const otherPlayer =
-        players[otherIndex];
+    const next =
+        nextAvailablePlayer(
+            otherIndex
+        );
 
-    while (
-        currentItemIndex < items.length &&
-        otherPlayer.items.length < 5
-    ) {
-        const item =
-            getCurrentItem();
-
-        if (
-            otherPlayer.money >= 1
-        ) {
-            otherPlayer.money -= 1;
-        }
-
-        otherPlayer.items.push(item);
-        currentItemIndex++;
-    }
-
-    if (
-        currentItemIndex >= items.length
-    ) {
-        updateUI();
-        endGame();
-        return;
-    }
-
-    currentBid = 1;
-    highestBidder = null;
-    currentPlayer = otherIndex;
+    currentPlayer =
+        next !== null
+            ? next
+            : winnerIndex;
 
     bidInput.value = "";
 
-    showStatus(
-        `Player ${playerIndex + 1} filled all 5 slots. Remaining items went to Player ${otherIndex + 1} for $1 each.`
-    );
-
     updateUI();
-    checkForZeroMoney();
+    checkPlayerTurn();
 }
 
 function distributeRemainingItems() {
-    if (!gameStarted) {
-        return;
-    }
-
     while (
-        currentItemIndex < items.length &&
-        (
-            player1.items.length < 5 ||
-            player2.items.length < 5
-        )
+        currentItemIndex < items.length
     ) {
+        const available = players.filter(
+            player =>
+                player.items.length < 5
+        );
+
+        if (
+            available.length === 0
+        ) {
+            break;
+        }
+
         let target;
 
         if (
@@ -1206,12 +1220,8 @@ function distributeRemainingItems() {
                 player2.items.length
                     ? player1
                     : player2;
-        } else if (
-            player1.items.length < 5
-        ) {
-            target = player1;
         } else {
-            target = player2;
+            target = available[0];
         }
 
         const item =
@@ -1220,7 +1230,10 @@ function distributeRemainingItems() {
         if (
             target.money >= 1
         ) {
-            target.money -= 1;
+            target.money =
+                money(
+                    target.money - 1
+                );
         }
 
         target.items.push(item);
@@ -1234,12 +1247,12 @@ function distributeRemainingItems() {
 function updateUI() {
     if (money1Element) {
         money1Element.textContent =
-            player1.money;
+            player1.money.toFixed(2);
     }
 
     if (money2Element) {
         money2Element.textContent =
-            player2.money;
+            player2.money.toFixed(2);
     }
 
     if (count1Element) {
@@ -1262,7 +1275,7 @@ function updateUI() {
 
     if (currentBidElement) {
         currentBidElement.textContent =
-            currentBid;
+            currentBid.toFixed(2);
     }
 
     if (itemsRemainingElement) {
@@ -1373,13 +1386,6 @@ function updateButtons() {
     const player =
         players[currentPlayer];
 
-    const otherPlayer =
-        players[
-            currentPlayer === 0
-                ? 1
-                : 0
-        ];
-
     if (
         player.items.length >= 5
     ) {
@@ -1394,28 +1400,42 @@ function updateButtons() {
     ) {
         bidButton.disabled = true;
         bidInput.disabled = true;
-    } else {
-        bidButton.disabled = false;
-        bidInput.disabled = false;
+        passButton.disabled =
+            highestBidder === null;
+        return;
     }
+
+    bidButton.disabled = false;
+    bidInput.disabled = false;
 
     if (
         highestBidder === null
     ) {
-        bidInput.min = 1;
-        bidInput.placeholder = "Enter bid";
+        bidInput.min = "1";
+        bidInput.step = "0.01";
+        bidInput.placeholder = "1.00";
+
+        const otherPlayer =
+            players[
+                currentPlayer === 0 ? 1 : 0
+            ];
 
         passButton.disabled =
             !(
-                otherPlayer.money === 0 ||
+                otherPlayer.money <= 0 ||
                 otherPlayer.items.length >= 5
             );
     } else {
         bidInput.min =
-            currentBid + 1;
+            String(
+                money(currentBid + 0.01)
+            );
 
+        bidInput.step = "0.01";
         bidInput.placeholder =
-            `Min $${currentBid + 1}`;
+            money(
+                currentBid + 0.01
+            ).toFixed(2);
 
         passButton.disabled = false;
     }
@@ -1488,28 +1508,15 @@ async function startGame() {
     highestBidder = null;
     items = [];
 
-    if (bidInput) {
-        bidInput.disabled = true;
-        bidInput.value = "";
-    }
+    bidInput.disabled = true;
+    bidButton.disabled = true;
+    passButton.disabled = true;
 
-    if (bidButton) {
-        bidButton.disabled = true;
-    }
+    themeElement.textContent =
+        "Loading theme...";
 
-    if (passButton) {
-        passButton.disabled = true;
-    }
-
-    if (themeElement) {
-        themeElement.textContent =
-            "Loading theme...";
-    }
-
-    if (currentItemElement) {
-        currentItemElement.textContent =
-            "Loading items...";
-    }
+    currentItemElement.textContent =
+        "Loading items...";
 
     updateUI();
 
@@ -1530,10 +1537,7 @@ async function startGame() {
 
             items =
                 [...game.items];
-
-        } else if (
-            gameMode === "ai"
-        ) {
+        } else {
             const generated =
                 await generateWithRetry();
 
@@ -1549,7 +1553,7 @@ async function startGame() {
             items.length !== 10
         ) {
             throw new Error(
-                "Game did not contain 10 items."
+                "Invalid game"
             );
         }
 
@@ -1564,6 +1568,7 @@ async function startGame() {
         );
 
         updateUI();
+        checkPlayerTurn();
 
     } catch (error) {
         console.warn(
@@ -1598,6 +1603,7 @@ async function startGame() {
         );
 
         updateUI();
+        checkPlayerTurn();
     }
 }
 
@@ -1619,12 +1625,9 @@ if (bidButton) {
     bidButton.addEventListener(
         "click",
         () => {
-            const bid =
-                Number(
-                    bidInput.value
-                );
-
-            placeBid(bid);
+            placeBid(
+                bidInput.value
+            );
         }
     );
 }
@@ -1632,9 +1635,7 @@ if (bidButton) {
 if (passButton) {
     passButton.addEventListener(
         "click",
-        () => {
-            pass();
-        }
+        pass
     );
 }
 
@@ -1645,12 +1646,9 @@ if (bidInput) {
             if (
                 event.key === "Enter"
             ) {
-                const bid =
-                    Number(
-                        bidInput.value
-                    );
-
-                placeBid(bid);
+                placeBid(
+                    bidInput.value
+                );
             }
         }
     );
@@ -1659,9 +1657,7 @@ if (bidInput) {
 if (newGameButton) {
     newGameButton.addEventListener(
         "click",
-        () => {
-            showModeScreen();
-        }
+        showModeScreen
     );
 }
 
