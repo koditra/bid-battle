@@ -2,7 +2,7 @@
 
 Bid Battle is a 2-player auction game where you compete to build the best thing by bidding on different parts :)
 
-<img width="1001" height="625" alt="image" src="https://github.com/user-attachments/assets/45910a1c-01dc-4b9f-868a-f4da2f13844a" />
+<img width="688" height="322.5" alt="Screenshot 2026-08-29 at 2 25 29 PM" src="https://github.com/user-attachments/assets/650ac74a-a2b8-42cd-bda2-931a03de18cb" />
 
 ## how it works
 
